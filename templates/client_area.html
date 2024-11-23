@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Área do Cliente</title>
+    <link rel="stylesheet" href="/static/css/styles.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <div class="container">
+        <!-- Barra Lateral -->
+        <aside class="sidebar">
+            <h2>Menu</h2>
+            <ul>
+                <li><a href="#">Dashboard</a></li>
+                <li><a href="#">Configurações</a></li>
+                <li><a href="#">Suporte</a></li>
+                <li><a href="#">Sair</a></li>
+            </ul>
+        </aside>
+
+        <!-- Conteúdo Principal -->
+        <main class="main-content">
+            <header>
+                <h1>Bem-vindo, {{ username }}</h1>
+                <a href="/loja" class="back-to-store">Voltar para a Loja</a>
+            </header>
+
+            <section class="dashboard">
+                <h2>Seus Ganhos</h2>
+                <div class="card">
+                    <h3>R$ 2.500,00</h3>
+                    <p>Ganhos Totais</p>
+                </div>
+                <div class="card">
+                    <h3>R$ 800,00</h3>
+                    <p>Ganhos Este Mês</p>
+                </div>
+            </section>
+
+            <section class="charts">
+                <h2>Gráficos de Evolução</h2>
+                <canvas id="evolutionChart"></canvas>
+            </section>
+        </main>
+    </div>
+
+    <script>
+        // Configuração do gráfico usando Chart.js
+        const ctx = document.getElementById('evolutionChart').getContext('2d');
+        const evolutionChart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho'],
+                datasets: [{
+                    label: 'Ganhos (R$)',
+                    data: [500, 700, 1200, 1500, 2000, 2500],
+                    borderColor: '#ffd700',
+                    backgroundColor: 'rgba(255, 215, 0, 0.3)',
+                    fill: true,
+                    tension: 0.4
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: {
+                        display: false
+                    }
+                }
+            }
+        });
+    </script>
+</body>
+</html>
