@@ -1,76 +1,139 @@
+<!-- templates/area_cliente.html -->
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="pt-br">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Área do Cliente</title>
-    <link rel="stylesheet" href="/static/css/styles.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/client_styles.css') }}">
+    <!-- Font Awesome para ícones (opcional) -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" integrity="sha512-" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <!-- Chart.js para gráficos -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-</head>
+    <script src="https://cdn.anychart.com/releases/8.7.1/js/anychart-core.min.js"></script>
+    <script src="https://cdn.anychart.com/releases/8.7.1/js/anychart-stock.min.js"></script>
+    </head>
 <body>
-    <div class="container">
-        <!-- Barra Lateral -->
-        <aside class="sidebar">
-            <h2>Menu</h2>
-            <ul>
-                <li><a href="#">Dashboard</a></li>
-                <li><a href="#">Configurações</a></li>
-                <li><a href="#">Suporte</a></li>
-                <li><a href="#">Sair</a></li>
-            </ul>
-        </aside>
-
-        <!-- Conteúdo Principal -->
-        <main class="main-content">
-            <header>
-                <h1>Bem-vindo, {{ username }}</h1>
-                <a href="/loja" class="back-to-store">Voltar para a Loja</a>
-            </header>
-
-            <section class="dashboard">
-                <h2>Seus Ganhos</h2>
-                <div class="card">
-                    <h3>R$ 2.500,00</h3>
-                    <p>Ganhos Totais</p>
-                </div>
-                <div class="card">
-                    <h3>R$ 800,00</h3>
-                    <p>Ganhos Este Mês</p>
-                </div>
-            </section>
-
-            <section class="charts">
-                <h2>Gráficos de Evolução</h2>
-                <canvas id="evolutionChart"></canvas>
-            </section>
-        </main>
+   <header>
+    <div class="header-content">
+        <div class="logo">
+            <span class="logo-h1{">F</span>
+        </div>
+        <h1>Bem-vindo, {{ username }}</h1>
+    </div>
+   </header>
+   <!-- Botão para abrir o menu -->
+    <div id="menu-button" onclick="toggleMenu()">
+        ☰ <!-- Ícone de menu (pode ser substituído por um ícone de sua preferência) -->
     </div>
 
-    <script>
-        // Configuração do gráfico usando Chart.js
-        const ctx = document.getElementById('evolutionChart').getContext('2d');
-        const evolutionChart = new Chart(ctx, {
-            type: 'line',
-            data: {
-                labels: ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho'],
-                datasets: [{
-                    label: 'Ganhos (R$)',
-                    data: [500, 700, 1200, 1500, 2000, 2500],
-                    borderColor: '#ffd700',
-                    backgroundColor: 'rgba(255, 215, 0, 0.3)',
-                    fill: true,
-                    tension: 0.4
-                }]
-            },
-            options: {
-                responsive: true,
-                plugins: {
-                    legend: {
-                        display: false
-                    }
-                }
-            }
-        });
-    </script>
+    <!-- Menu lateral -->
+    <div id="sidebar" class="sidebar-oculto">
+        <ul>
+            <li><a href="#" onclick="mostrarSecao('investidor'); toggleMenu();">Investidor</a></li>
+            <li><a href="#" onclick="mostrarSecao('divulgador'); toggleMenu();">Divulgador</a></li>
+            <li><a href="#">Configurações</a></li>
+            <li><a href="{{ url_for('logout') }}">Sair</a></li>
+        </ul>
+   
+    </div>
+        <main>
+        <!-- Seção Investidor -->
+        <section id="investidor" class="secao-ativa">
+            <h1 class="titulo-estilizado">Página do Investidor</h1>
+        <!-- Cards de Informações -->
+        <div class="cards-container">
+           <div class="card-flip">
+              <div class="card-front">
+		<h3>Patrimônio Inicial</h3>
+		<p>R$ {{ patrimonio_inicial }}</p>
+              </div>
+            <div class="card-back">
+              <h3>Adicionar Créditos</h3>
+              <p>Clique aqui para adicionar</p>
+            </div>
+	  </div>            
+             <!-- Ganhos com efeito frente e verso -->
+    <div class="card-flip">
+        <div class="card-front">
+            <h3>Ganhos</h3>
+            <p>R$ {{ ganhos_em_reais }}</p>
+        </div>
+        <div class="card-back">
+            <h3>Ganhos em Porcentagem</h3>
+            <p>{{ porcentagem_ganhos }}%</p>
+        </div>
+    </div>
+    <!-- Patrimônio Atual com efeito frente e verso -->
+    <div class="card-flip">
+        <div class="card-front">
+            <h3>Patrimônio Atual</h3>
+            <p>R$ {{ patrimonio }}</p>
+        </div>
+        <div class="card-back">
+            <h3>Sacar</h3>
+            <p>Clique aqui para sacar</p>
+        </div>
+        </div>
+    </div>
+
+	<div id="grafico-patrimonio">
+	  <h3>Evolução do Patrimônio</h3>
+	  <div id="graficoDesempenho"></div> <!-- Troquei o <canvas> por uma <div> -->
+	  <script src="/static/js/candlestick.js"></script>
+	    </div>
+	</section>
+
+        <!-- Seção Divulgador -->
+        <section id="divulgador" class="secao-inativa">
+            <h2>Página do Divulgador</h2>
+            <div id="link-convite">
+                <h3>Seu Link de Convite</h3>
+                <input type="text" value="{{ link_convite }}" id="linkConvite" readonly>
+                <button onclick="copiarLink()">Copiar Link</button>
+            </div>
+            <div id="ganhos">
+                <h3>Suas Comissões</h3>
+                <div class="cartao-ganhos">
+                    <p>Total de Comissões Recebidas:</p>
+                    <p class="valor">R$ {{ comissoes_recebidas }}</p>
+                </div>
+            </div>
+            <div id="estatisticas">
+                <h3>Estatísticas de Indicações</h3>
+                <canvas id="graficoIndicacoes"></canvas>
+            </div>
+        </section>
+    </main>
+
+<script>
+       // Função para alternar a exibição do menu
+        function toggleMenu() {
+            var sidebar = document.getElementById('sidebar');
+            sidebar.classList.toggle('sidebar-oculto');
+        }
+        function toggleMenu() {
+        var sidebar = document.getElementById('sidebar');
+        var body = document.body;
+        sidebar.classList.toggle('sidebar-visivel');
+        sidebar.classList.toggle('sidebar-oculto');
+        body.classList.toggle('menu-aberto');
+    }
+        function mostrarSecao(secao) {
+            var secoes = document.querySelectorAll('main > section');
+            secoes.forEach(function(s) {
+                s.classList.remove('secao-ativa');
+                s.classList.add('secao-inativa');
+            });
+            document.getElementById(secao).classList.remove('secao-inativa');
+            document.getElementById(secao).classList.add('secao-ativa');
+        }
+
+        function copiarLink() {
+            var copyText = document.getElementById("linkConvite");
+            copyText.select();
+            document.execCommand("copy");
+            alert("Link copiado para a área de transferência!");
+        }
+       </script>
 </body>
 </html>

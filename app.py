@@ -213,7 +213,6 @@ def payment_failure():
 def payment_pending():
     return render_template("pending.html")
 
-
 @app.route('/client-area')
 def client_area():
     if 'user_id' not in session:
@@ -222,7 +221,7 @@ def client_area():
 
     conn = sqlite3.connect('usuarios.db')
     cursor = conn.cursor()
-    cursor.execute('SELECT pagante FROM usuarios WHERE id = ?', (session['user_id'],))
+    cursor.execute('SELECT pagante, username FROM usuarios WHERE id = ?', (session['user_id'],))
     user = cursor.fetchone()
     conn.close()
 
@@ -234,7 +233,32 @@ def client_area():
         flash('Acesso negado. É necessário adquirir o produto.', 'warning')
         return redirect(url_for('checkout'))
 
-    return render_template('client_area.html', username=session['username'])
+    # Dados para a seção Investidor
+    patrimonio = 10000  # Exemplo, substituir por dados reais do usuário
+    historico_patrimonio = [8000, 8500, 9000, 9500, 10000]  # Exemplo
+
+    ativos = [
+        {'nome': 'Ativo A', 'quantidade': 10, 'valor_atual': 100, 'variacao': 5},
+        {'nome': 'Ativo B', 'quantidade': 5, 'valor_atual': 200, 'variacao': -2},
+    ]  # Exemplo
+
+    # Dados para a seção Divulgador
+    link_convite = f"http://seusite.com/cadastrar?ref={session['user_id']}"
+    comissoes_recebidas = 500  # Exemplo, substituir por dados reais
+    total_indicacoes = 25  # Exemplo
+    desempenho_indicacoes = [5, 10, 15, 20, 25]  # Exemplo
+
+    return render_template(
+        'client_area.html',
+        username=user[1],
+        patrimonio=patrimonio,
+        historico_patrimonio=historico_patrimonio,
+        ativos=ativos,
+        link_convite=link_convite,
+        comissoes_recebidas=comissoes_recebidas,
+        total_indicacoes=total_indicacoes,
+        desempenho_indicacoes=desempenho_indicacoes
+    )
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(host='0.0.0.0',port=8081,debug=True)

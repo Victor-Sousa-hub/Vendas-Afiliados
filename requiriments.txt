@@ -1,3 +1,1 @@
-PyQt5
-PyQtWebEngine
-mysql-connector-python
+

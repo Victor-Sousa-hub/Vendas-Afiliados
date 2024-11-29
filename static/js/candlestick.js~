@@ -1,0 +1,39 @@
+// Inicializa o gráfico ao carregar o documento
+anychart.onDocumentReady(function () {
+    // Dados do gráfico
+    var data = [
+        { date: '2024-11-01', open: 20.5, high: 21, low: 20, close: 20.8 },
+        { date: '2024-11-02', open: 20.8, high: 21.5, low: 20.3, close: 21.1 },
+        { date: '2024-11-03', open: 21.1, high: 22, low: 20.7, close: 21.9 },
+        { date: '2024-11-04', open: 21.9, high: 22.5, low: 21.4, close: 22 },
+        { date: '2024-11-05', open: 22, high: 22.8, low: 21.9, close: 22.3 }
+    ];
+
+    // Cria uma tabela de dados
+    var dataTable = anychart.data.table('date');
+    dataTable.addData(data);
+
+    // Mapeia os dados para candlestick
+    var mapping = dataTable.mapAs({
+        open: 'open',
+        high: 'high',
+        low: 'low',
+        close: 'close'
+    });
+
+    // Cria o gráfico
+    var chart = anychart.stock();
+
+    // Adiciona o gráfico de candlestick
+    var series = chart.plot(0).candlestick(mapping);
+    series.name('Histórico de Preços');
+
+    // Configura o título do gráfico
+    chart.title('Evolução de Preços - Candlestick');
+
+    // Configura o contêiner
+    chart.container('container');
+
+    // Renderiza o gráfico
+    chart.draw();
+});

@@ -1,0 +1,263 @@
+/* Resetar margens e paddings padrão */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+/* Estilo do body */
+body {
+    font-family: Arial, sans-serif;
+    background-color: #141625; /* Cor de fundo similar à da imagem */
+    height: 100vh;
+    display: flex;
+    justify-content: center;  /* Centraliza horizontalmente */
+    align-items: center;      /* Centraliza verticalmente */
+}
+
+.hero {
+    background: linear-gradient(90deg, #004d40, #002d27);
+    color: #ffffff;
+    text-align: center;
+    padding: 50px 20px;
+}
+.hero h1 {
+    font-size: 2.5rem;
+}
+.hero p {
+    font-size: 1.2rem;
+    margin-top: 10px;
+}
+.cta-button {
+    padding: 20px;
+    text-align: center;
+    border-bottom: 1px solid #dee2e6;
+}
+
+header {
+    background-color:  #141625;
+    padding: 20px;
+    text-align: center;
+    border-bottom: 1px solid #dee2e6;
+}
+.header-content {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Logo */
+.logo {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 20px;
+}
+
+.logo-icon {
+    width: 50px;
+    height: 50px;
+    background-color: #28a745; /* Cor verde */
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #ffffff;
+    font-size: 24px;
+    font-weight: bold;
+    margin-right: 10px; /* Espaço entre o ícone e o texto */
+}
+
+.logo h1 {
+    font-size: 24px;
+    color: #ffffff;
+}
+
+.logo-img {
+    width: 150px;
+    height: 150px;
+    margin-right: 10px;
+}
+
+/* Botão do menu */
+#menu-button {
+    position: fixed;
+    top: 20px;
+    left: 20px;
+    font-size: 30px;
+    cursor: pointer;
+    z-index: 1000;
+}
+
+/* Estilos para o menu lateral */
+#sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 250px;
+    height: 100%;
+    background-color: #343a40;
+    color: #ffffff;
+    padding-top: 60px;
+    transform: translateX(-250px);
+    transition: transform 0.3s ease;
+    z-index: 999;
+}
+
+#sidebar ul {
+    list-style-type: none;
+    padding: 0;
+}
+
+#sidebar ul li {
+    padding: 15px 20px;
+}
+
+#sidebar ul li a {
+    color: #ffffff;
+    text-decoration: none;
+    display: block;
+}
+
+#sidebar ul li a:hover {
+    background-color: #495057;
+}
+
+/* Classe para mostrar o menu */
+#sidebar.sidebar-oculto {
+    transform: translateX(-250px);
+}
+
+#sidebar.sidebar-visivel {
+    transform: translateX(0);
+}
+
+/* Ajustar o conteúdo principal quando o menu está visível */
+body.menu-aberto main {
+    margin-left: 250px;
+    transition: margin-left 0.3s ease;
+}
+
+}
+
+/* Container principal */
+.login-container {
+    width: 100%;
+    max-width: 400px;
+    text-align: center;
+}
+
+/* Estilo do logo */
+.logo h1 {
+    font-size: 36px;
+    color: #333;
+    margin-bottom: 20px;
+}
+
+.logo-icon {
+    color: #28a745; /* Cor verde */
+    font-weight: bold;
+}
+
+/* Container da caixa de login */
+.login-container {
+    width: 100%;
+    max-width: 400px;
+    text-align: center;
+}
+
+/* Estilo da caixa de login */
+.login-box {
+    background-color: #1e2037; /* Cor de fundo da caixa */
+    padding: 40px;
+    border-radius: 10px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+}
+
+/* Logo */
+.logo img {
+    max-width: 100%;
+    height: auto;
+    margin-bottom: 20px;
+}
+
+/* Título da caixa */
+.login-box h2 {
+    margin-bottom: 20px;
+    color: #ffffff;
+    font-weight: bold;
+}
+
+/* Tabs (Login e Registrar) */
+.tabs {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 30px;
+}
+
+.tabs a {
+    margin: 0 20px;
+    text-decoration: none;
+    color: #888;
+    font-weight: bold;
+    font-size: 16px;
+    transition: color 0.3s ease;
+}
+
+.tabs a.active {
+    color: #00b894;  /* Verde para a aba ativa */
+    border-bottom: 2px solid #00b894;
+}
+
+.tabs a:hover {
+    color: #00b894; /* Efeito hover nas abas */
+}
+
+/* Estilo dos campos de entrada */
+.login-box input[type="text"],
+.login-box input[type="password"],
+.login-box input[type="email"]{
+    width: 100%;
+    padding: 15px;
+    margin-bottom: 20px;
+    border: none;
+    border-radius: 5px;
+    font-size: 16px;
+    background-color: #2b2f48; /* Cor de fundo do campo */
+    color: #ffffff; /* Texto branco */
+}
+
+.login-box input::placeholder {
+    color: #b0b3c7;
+}
+
+/* Estilo do botão de login */
+.login-box button[type="submit"] {
+    width: 100%;
+    padding: 15px;
+    background-color: #00b894; /* Verde do botão */
+    color: #ffffff;
+    border: none;
+    border-radius: 5px;
+    font-size: 18px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.login-box button[type="submit"]:hover {
+    background-color: #019d7a;
+}
+
+/* Link de "Esqueceu sua senha?" */
+.forgot-password {
+    margin-top: 15px;
+    display: block;
+    color: #b0b3c7;
+    text-decoration: none;
+    font-size: 14px;
+}
+
+.forgot-password:hover {
+    color: #00b894;
+}
