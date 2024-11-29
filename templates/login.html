@@ -12,6 +12,20 @@
 	    <img src="https://i.postimg.cc/MpJ7WpVZ/DALL-E-2024-11-27-15-10-07-A-clean-and-minimalist-logo-removebg-preview.png" alt="WINFUND Logo" class="logo-img">
             <h1> FIN20 Investimentos</h1>
         </div>
+
+        <!-- Bloco para mensagens de alerta -->
+        {% with messages = get_flashed_messages(with_categories=True) %}
+          {% if messages %}
+            <div class="alert-container">
+              {% for category, message in messages %}
+                <div class="alert alert-{{ category }}">
+                  {{ message }}
+                </div>
+              {% endfor %}
+            </div>
+          {% endif %}
+        {% endwith %}
+
         <div class="login-box">
             <h2>Conecte-se</h2>
             <div class="tabs">
@@ -22,7 +36,7 @@
                  <input type="text" name="username" placeholder="Username" required>
 		 <input type="password" name="password" placeholder="Password" required>
 		 <button type="submit">Entrar</button>
-                <a href="#" class="forgot-password">Esqueceu sua senha?</a>
+                <a href="/forgot-password" class="forgot-password">Esqueceu sua senha?</a>
             </form>
         </div>
     </div>

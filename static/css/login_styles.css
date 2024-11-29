@@ -137,9 +137,6 @@ body.menu-aberto main {
     margin-left: 250px;
     transition: margin-left 0.3s ease;
 }
-
-}
-
 /* Container principal */
 .login-container {
     width: 100%;
@@ -260,4 +257,50 @@ body.menu-aberto main {
 
 .forgot-password:hover {
     color: #00b894;
+}
+
+/* Oculta os requisitos por padrão */
+.password-requirements {
+    display: none;
+    position: absolute;
+    background-color: #f9f9f9;
+    border: 1px solid #ddd;
+    padding: 10px;
+    margin-top: 5px;
+    z-index: 10;
+    font-size: 14px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Exibe os requisitos quando o mouse passa sobre o rótulo */
+.password-label:hover .password-requirements {
+    display: block;
+}
+
+.alert-container {
+    margin-bottom: 20px;
+    text-align: center; /* Centraliza o conteúdo dos alertas */
+}
+
+.alert {
+    padding: 15px;
+    margin-bottom: 10px;
+    border: 1px solid transparent;
+    border-radius: 4px;
+    font-size: 14px;
+    display: inline-block;
+    width: 90%; /* Ajusta a largura para preencher a tela */
+    max-width: 500px; /* Define um limite para largura */
+}
+
+.alert-success {
+    color: #155724;
+    background-color: #d4edda;
+    border-color: #c3e6cb;
+}
+
+.alert-danger {
+    color: #721c24;
+    background-color: #f8d7da;
+    border-color: #f5c6cb;
 }
