@@ -85,7 +85,7 @@
 
         <!-- Seção Divulgador -->
         <section id="divulgador" class="secao-inativa">
-            <h2>Página do Divulgador</h2>
+            <h1 class="titulo-estilizado-divulgador">Página do Divulgador</h1>
             <div id="link-convite">
                 <h3>Seu Link de Convite</h3>
                 <input type="text" value="{{ link_convite }}" id="linkConvite" readonly>
@@ -99,9 +99,24 @@
                 </div>
             </div>
             <div id="estatisticas">
-                <h3>Estatísticas de Indicações</h3>
-                <canvas id="graficoIndicacoes"></canvas>
+                <h3>Tabela de convidados</h3>
+                <table class="tabela-indicacoes">
+                    <thead>
+                        <tr>
+                            <th>Nome</th>
+                            <th>E-mail</th>
+                            <th>Convidados</th>
+                            <th>Comissões</th>
+                            <th>Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tabelaIndicacoes">
+                        <!-- Linhas serão inseridas dinamicamente via JavaScript -->
+                    </tbody>
+                </table>
             </div>
+            <!-- Incluindo o arquivo JavaScript -->
+            <script src="/static/js/estatisticas.js"></script>
         </section>
     </main>
 

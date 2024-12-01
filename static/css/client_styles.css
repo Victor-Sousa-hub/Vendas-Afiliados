@@ -278,6 +278,17 @@ body.menu-aberto main {
     letter-spacing: 2px;
     text-transform: uppercase;
 }
+
+.titulo-estilizado-divulgador {
+    font-size: 36px;
+    font-weight: bold;
+    text-align: center;
+    color: #ffc107;
+    text-shadow: 2px 2px 8px rgba(223, 248, 0, 0.6), 0 0 20px rgb(255, 230, 0);
+    margin-bottom: 30px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+}
 .cards-container {
     display: flex;
     justify-content: space-around;
@@ -344,4 +355,47 @@ body.menu-aberto main {
     margin: 0; /* Remove margens extras (se necessário) */
     text-align: center; /* Centraliza o texto (opcional) */
     color: white; /* Mantém o texto visível */
+}
+
+.tabela-indicacoes {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 20px 0;
+}
+
+.tabela-indicacoes th, .tabela-indicacoes td {
+    border: 1px solid #ddd;
+    padding: 8px;
+    text-align: left;
+}
+
+.tabela-indicacoes th {
+    background-color: #f4f4f4;
+    font-weight: bold;
+    color: black; /* Cor do texto */
+}
+
+.tabela-subindicacoes {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 10px;
+}
+
+.tabela-subindicacoes th, .tabela-subindicacoes td {
+    border: 1px solid #ddd;
+    padding: 8px;
+    
+}
+
+.toggle-btn {
+    background-color: #007bff;
+    color: #fff;
+    border: none;
+    padding: 5px 10px;
+    cursor: pointer;
+    border-radius: 4px;
+}
+
+.toggle-btn:hover {
+    background-color: #0056b3;
 }

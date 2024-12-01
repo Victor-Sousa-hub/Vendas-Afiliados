@@ -1,4 +1,4 @@
-from flask import Flask, render_template, redirect, url_for, request, flash, session
+from flask import Flask, render_template, redirect, url_for, request, flash, session,jsonify
 from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user, current_user
 from flask_mail import Mail, Message
 from urllib.parse import urlparse, urljoin
@@ -56,29 +56,30 @@ def is_safe_url(target):
     test_url = urlparse(urljoin(request.host_url, target))
     return test_url.scheme in ('http', 'https') and ref_url.netloc == test_url.netloc
 
-def generate_referral_link(user_id):
-    base_url = "https://example.com/register"
-    unique_code = uuid.uuid4().hex[:8]
-    return f"{base_url}?ref={unique_code}"
+def generate_referral_link(username):
+    """Gera um código de convite único baseado no nome do usuário e um código aleatório."""
+    unique_code = uuid.uuid4().hex[:8]  # Gera um código aleatório único
+    return f"{username}-{unique_code}"
 
 def init_db():
     """Inicializa o banco de dados."""
     conn = sqlite3.connect('usuarios.db')
     cursor = conn.cursor()
     cursor.execute("""
-    CREATE TABLE IF NOT EXISTS usuarios (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        username TEXT UNIQUE NOT NULL,
-        email TEXT UNIQUE NOT NULL,
-        password TEXT NOT NULL,
-        referral_link TEXT UNIQUE,
-        cpf TEXT UNIQUE NOT NULL,
-        pagante INTERGET DEFAULT 0
-    )
-    """)
+        CREATE TABLE IF NOT EXISTS usuarios (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            username TEXT UNIQUE NOT NULL,
+            email TEXT UNIQUE NOT NULL,
+            password TEXT NOT NULL,
+            referral_link TEXT UNIQUE,
+            cpf TEXT UNIQUE NOT NULL,
+            pagante INTEGER DEFAULT 0,
+            convidados INTEGER DEFAULT 0,
+            nivel INTEGER DEFAULT 0,
+            corretor TEXT DEFAULT NULL);
+            """)
     conn.commit()
     conn.close()
-init_db()
 
 def is_password_strong(password):
     """Verifica se a senha atende aos requisitos."""
@@ -94,7 +95,7 @@ class User(UserMixin):
     def __init__(self, id, username, email):
         self.id = id
         self.username = username
-        self.email = email
+        self.email = email       
 
 # Função para carregar usuário pelo ID
 @login_manager.user_loader
@@ -107,6 +108,48 @@ def load_user(user_id):
     if user:
         return User(id=user[0], username=user[1], email=user[2])
     return None
+
+def update_corretor_levels(user_id, cursor, max_levels=10):
+    """
+    Atualiza os níveis dos corretores até o limite de 10 níveis.
+    :param user_id: ID do usuário atual.
+    :param cursor: Cursor para o banco de dados.
+    :param max_levels: Número máximo de níveis a serem atualizados.
+    """
+    current_user_id = user_id
+    corretores = set()  # Set para armazenar IDs únicos dos corretores
+
+    print(f"[DEBUG] Iniciando atualização de níveis para o usuário ID {user_id}")
+
+    # Construir o set de corretores na hierarquia
+    while current_user_id and len(corretores) < max_levels:
+        print(f"[DEBUG] Buscando corretor do usuário ID {current_user_id}")
+        cursor.execute("SELECT corretor FROM usuarios WHERE id = ?", (current_user_id,))
+        corretor = cursor.fetchone()
+
+        if not corretor or not corretor[0]:
+            print(f"[DEBUG] Nenhum corretor encontrado para o usuário ID {current_user_id}. Encerrando busca.")
+            break  # Não há mais corretores na hierarquia
+
+        # Buscar o ID do corretor
+        print(f"[DEBUG] Corretor encontrado: {corretor[0]}. Buscando ID correspondente.")
+        cursor.execute("SELECT id FROM usuarios WHERE referral_link = ?", (corretor[0],))
+        next_corretor = cursor.fetchone()
+
+        if not next_corretor:
+            print(f"[DEBUG] Nenhum ID correspondente encontrado para o corretor {corretor[0]}. Encerrando busca.")
+            break  # Não há próximo corretor
+
+        corretores.add(next_corretor[0])  # Adicionar o ID do corretor ao set
+        print(f"[DEBUG] Adicionado corretor ID {next_corretor[0]} à lista de atualizações.")
+        current_user_id = next_corretor[0]  # Atualizar para o próximo corretor
+
+    # Incrementar o nível de todos os corretores no set
+    print(f"[DEBUG] Corretores únicos para atualização: {corretores}")
+    for corretor_id in corretores:
+        print(f"[DEBUG] Incrementando nível do corretor ID {corretor_id}")
+        cursor.execute("UPDATE usuarios SET nivel = nivel + 1 WHERE id = ?", (corretor_id,))
+    print(f"[DEBUG] Atualização de níveis concluída.")
 
 ###########################################################################################
 #                                   ROTAS                                                 #
@@ -175,6 +218,7 @@ def signup():
         cpf = request.form.get('cpf')
         password = request.form.get('password')
         confirm_password = request.form.get('confirm-password')
+        referral_link = request.form.get('referral_link')  # Link de convite (opcional)
 
         # Verificar CPF
         if not cpf_validator.validate(cpf):
@@ -188,6 +232,27 @@ def signup():
 
         hashed_password = generate_password_hash(password, method='pbkdf2:sha256')
 
+        # Validação do link de convite, se fornecido
+        if referral_link:
+            conn = sqlite3.connect('usuarios.db')
+            cursor = conn.cursor()
+
+            # Buscar o usuário que gerou o link
+            cursor.execute("SELECT id, username, email, convidados FROM usuarios WHERE referral_link = ?", (referral_link,))
+            referrer = cursor.fetchone()
+
+            if not referrer:
+                flash('Link de convite inválido. Verifique e tente novamente.', 'danger')
+                conn.close()
+                return redirect(url_for('signup'))
+
+            referrer_id, referrer_username, referrer_email, referrer_convidados = referrer
+
+            # Incrementar a coluna `convidados`
+            cursor.execute("UPDATE usuarios SET convidados = convidados + 1 WHERE id = ?", (referrer_id,))
+            conn.commit()
+            conn.close()
+
         # Geração do código de verificação
         verification_code = str(random.randint(100000, 999999))
 
@@ -197,6 +262,7 @@ def signup():
             'email': email,
             'cpf': cpf,
             'password': hashed_password,
+            'referral_link': referral_link,  # Link usado, se fornecido
             'verification_code': verification_code
         }
 
@@ -236,13 +302,14 @@ def verify():
 
             # Salvar o usuário no banco definitivo
             cursor.execute(
-                "INSERT INTO usuarios (username, email, password, referral_link, cpf) VALUES (?, ?, ?, ?, ?)",
+                "INSERT INTO usuarios (username, email, password, referral_link, cpf,corretor) VALUES (?, ?, ?, ?, ?,?)",
                 (
                     pending_user['username'],
                     pending_user['email'],
                     pending_user['password'],
-                    f"https://example.com/register?ref={pending_user['username']}-{uuid.uuid4().hex[:8]}",
-                    pending_user['cpf']
+                    generate_referral_link(pending_user['username']),
+                    pending_user['cpf'],
+                    pending_user['referral_link']
                 )
             )
             conn.commit()
@@ -406,15 +473,23 @@ def payment_success():
     if 'user_id' in session:
         conn = sqlite3.connect('usuarios.db')
         cursor = conn.cursor()
+
+        # Atualizar o status de pagamento do usuário
         cursor.execute('UPDATE usuarios SET pagante = 1 WHERE id = ?', (session['user_id'],))
+        # Atualizar os níveis de corretores
+        update_corretor_levels(session['user_id'], cursor)
+
+        
         conn.commit()
         conn.close()
+
+        
+
         flash('Pagamento confirmado! Você agora tem acesso à área exclusiva.', 'success')
         return redirect(url_for('client_area'))
     else:
         flash('Faça login antes de realizar o pagamento.', 'danger')
         return redirect(url_for('login'))
-    return render_template("success.html")
 
 # Página de falha
 @app.route('/payment/failure')
@@ -434,44 +509,77 @@ def client_area():
 
     conn = sqlite3.connect('usuarios.db')
     cursor = conn.cursor()
-    cursor.execute('SELECT pagante, username FROM usuarios WHERE id = ?', (session['user_id'],))
+
+    # Buscar informações do usuário atual
+    cursor.execute('SELECT referral_link, convidados, nivel, pagante, username FROM usuarios WHERE id = ?', (session['user_id'],))
     user = cursor.fetchone()
-    conn.close()
 
     if not user:
         flash('Usuário não encontrado. Faça login novamente.', 'danger')
         session.clear()
         return redirect(url_for('login'))
-    elif user[0] == 0:
+
+    if user[3] == 0:  # Verifica se o usuário é pagante
         flash('Acesso negado. É necessário adquirir o produto.', 'warning')
         return redirect(url_for('checkout'))
 
-    # Dados para a seção Investidor
-    patrimonio = 10000  # Exemplo, substituir por dados reais do usuário
-    historico_patrimonio = [8000, 8500, 9000, 9500, 10000]  # Exemplo
+    # Buscar comissões do usuário
+    cursor.execute('SELECT nivel FROM usuarios WHERE id = ?', (session['user_id'],))
+    total_comissoes = cursor.fetchone()[0] or 0.0  # Define 0.0 se não houver comissões    
 
-    ativos = [
-        {'nome': 'Ativo A', 'quantidade': 10, 'valor_atual': 100, 'variacao': 5},
-        {'nome': 'Ativo B', 'quantidade': 5, 'valor_atual': 200, 'variacao': -2},
-    ]  # Exemplo
+    conn.commit()
+    conn.close()
 
     # Dados para a seção Divulgador
-    link_convite = f"http://seusite.com/cadastrar?ref={session['user_id']}"
-    comissoes_recebidas = 500  # Exemplo, substituir por dados reais
-    total_indicacoes = 25  # Exemplo
-    desempenho_indicacoes = [5, 10, 15, 20, 25]  # Exemplo
+    link_convite = user[0]
+    comissoes_recebidas = total_comissoes*2 
 
     return render_template(
         'client_area.html',
-        username=user[1],
-        patrimonio=patrimonio,
-        historico_patrimonio=historico_patrimonio,
-        ativos=ativos,
+        username=user[4],
         link_convite=link_convite,
         comissoes_recebidas=comissoes_recebidas,
-        total_indicacoes=total_indicacoes,
-        desempenho_indicacoes=desempenho_indicacoes
     )
 
+# Rota para buscar dados das indicações
+@app.route("/api/indicacoes")
+def get_indicacoes():
+    conn = sqlite3.connect('usuarios.db')
+    cursor = conn.cursor()
+
+    # Buscar usuários e corretores
+    cursor.execute("""
+        SELECT id, username, email, convidados, nivel FROM usuarios
+    """)
+    usuarios = cursor.fetchall()
+
+    indicacoes = []
+
+    for usuario in usuarios:
+        id_usuario, nome, email, convidados, nivel = usuario
+
+        # Buscar os convidados deste usuário
+        cursor.execute("""
+            SELECT username, email, nivel FROM usuarios WHERE corretor = (
+                SELECT referral_link FROM usuarios WHERE id = ?
+            )
+        """, (id_usuario,))
+        convidados = cursor.fetchall()
+
+        indicacoes.append({
+            "nome": nome,
+            "email": email,
+            "comissoes": nivel * 2,  # Exemplo de cálculo de comissão
+            "convidados": [
+                {"nome": convidado[0], "email": convidado[1], "comissoes": convidado[2] * 2}
+                for convidado in convidados
+            ],
+        })
+
+    conn.close()
+    return jsonify(indicacoes)
+
+
 if __name__ == '__main__':
+    init_db()
     app.run(host='0.0.0.0',port=8081,debug=True)
