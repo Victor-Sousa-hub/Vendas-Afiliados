@@ -544,35 +544,44 @@ def client_area():
 # Rota para buscar dados das indicações
 @app.route("/api/indicacoes")
 def get_indicacoes():
+    if 'user_id' not in session:
+        return jsonify({"error": "Usuário não autorizado"}), 401
+
+    user_id = session['user_id']  # ID do usuário logado
     conn = sqlite3.connect('usuarios.db')
     cursor = conn.cursor()
 
-    # Buscar usuários e corretores
-    cursor.execute("""
-        SELECT id, username, email, convidados, nivel FROM usuarios
-    """)
-    usuarios = cursor.fetchall()
+    # Obter o link de convite do usuário logado
+    cursor.execute("SELECT referral_link FROM usuarios WHERE id = ?", (user_id,))
+    user_referral_link = cursor.fetchone()
+
+    if not user_referral_link:
+        conn.close()
+        return jsonify([])  # Usuário não tem convidados
+
+    user_referral_link = user_referral_link[0]
+
+    # Buscar convidados diretos do usuário logado
+    cursor.execute("SELECT id, username, email, nivel FROM usuarios WHERE corretor = ?", (user_referral_link,))
+    convidados_diretos = cursor.fetchall()
 
     indicacoes = []
 
-    for usuario in usuarios:
-        id_usuario, nome, email, convidados, nivel = usuario
+    # Adicionar informações dos convidados diretos e buscar seus convidados (indiretos)
+    for convidado_direto in convidados_diretos:
+        convidado_id, nome, email, nivel = convidado_direto
 
-        # Buscar os convidados deste usuário
-        cursor.execute("""
-            SELECT username, email, nivel FROM usuarios WHERE corretor = (
-                SELECT referral_link FROM usuarios WHERE id = ?
-            )
-        """, (id_usuario,))
-        convidados = cursor.fetchall()
+        # Buscar os convidados indiretos deste convidado
+        cursor.execute("SELECT username, email, nivel FROM usuarios WHERE corretor = (SELECT referral_link FROM usuarios WHERE id = ?)", (convidado_id,))
+        convidados_indiretos = cursor.fetchall()
 
         indicacoes.append({
             "nome": nome,
             "email": email,
             "comissoes": nivel * 2,  # Exemplo de cálculo de comissão
             "convidados": [
-                {"nome": convidado[0], "email": convidado[1], "comissoes": convidado[2] * 2}
-                for convidado in convidados
+                {"nome": indireto[0], "email": indireto[1], "comissoes": indireto[2] * 2}
+                for indireto in convidados_indiretos
             ],
         })
 
