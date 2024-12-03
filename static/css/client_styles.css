@@ -399,3 +399,103 @@ body.menu-aberto main {
 .toggle-btn:hover {
     background-color: #0056b3;
 }
+#divulgador {
+    display: block;
+}
+
+/* Container dos cards */
+.config-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 20px;
+    flex-wrap: wrap;
+    margin-top: 60px; /* Evita que os cards encostem no cabeçalho */
+}
+
+/* Estilo dos cards */
+.card {
+    background-color: #333;
+    border-radius: 10px;
+    width: 200px;
+    padding: 20px;
+    text-align: center;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+    transition: transform 0.3s, box-shadow 0.3s;
+}
+
+.card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 6px 10px rgba(0, 0, 0, 0.3);
+}
+
+/* Ícone no card */
+.icon-container {
+    font-size: 3em;
+    margin-bottom: 15px;
+    color: #4CAF50; /* Verde para destacar os ícones */
+}
+
+/* Título do card */
+.card h2 {
+    margin: 10px 0;
+    font-size: 1.2em;
+    color: #fff;
+}
+
+/* Botão dentro do card */
+.card button {
+    padding: 10px 20px;
+    border: none;
+    background-color: #4CAF50;
+    color: #fff;
+    font-size: 1em;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.card button:hover {
+    background-color: #45a049;
+}
+/* Seção do formulário */
+
+/* Estilo para os formulários */
+.form-container {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    z-index: 1000;
+}
+
+.btn {
+    display: block;
+    width: 100%;
+    background-color: #4CAF50;
+    color: white;
+    padding: 10px;
+    font-size: 1em;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    text-align: center;
+}
+
+.btn:hover {
+    background-color: #45a049;
+}
+
+.voltar-btn {
+    background-color: #e74c3c;
+    margin-top: 10px;
+}
+
+.voltar-btn:hover {
+    background-color: #c0392b;
+}
+

@@ -470,26 +470,36 @@ def create_payment():
 # Página de sucesso
 @app.route('/payment/success')
 def payment_success():
+    # Obter o ID do pagamento e do pedido (enviado pelo Mercado Pago nas back_urls)
+    payment_id = request.args.get('payment_id')
+    status = request.args.get('status')
+
+    # Validar se o status do pagamento é aprovado
+    if not payment_id or status != 'approved':
+        flash('Pagamento inválido ou não autorizado.', 'danger')
+        return redirect(url_for('checkout'))
+
+    # Confirmar o pagamento com a API do Mercado Pago
+    payment_info = sdk.payment().get(payment_id)
+    if payment_info['response'].get('status') != 'approved':
+        flash('Pagamento não foi aprovado. Tente novamente.', 'danger')
+        return redirect(url_for('checkout'))
+
+    # Atualizar o status de pagamento no banco de dados
     if 'user_id' in session:
         conn = sqlite3.connect('usuarios.db')
         cursor = conn.cursor()
-
-        # Atualizar o status de pagamento do usuário
         cursor.execute('UPDATE usuarios SET pagante = 1 WHERE id = ?', (session['user_id'],))
-        # Atualizar os níveis de corretores
         update_corretor_levels(session['user_id'], cursor)
-
-        
         conn.commit()
         conn.close()
-
-        
 
         flash('Pagamento confirmado! Você agora tem acesso à área exclusiva.', 'success')
         return redirect(url_for('client_area'))
     else:
         flash('Faça login antes de realizar o pagamento.', 'danger')
         return redirect(url_for('login'))
+
 
 # Página de falha
 @app.route('/payment/failure')
@@ -588,7 +598,152 @@ def get_indicacoes():
     conn.close()
     return jsonify(indicacoes)
 
+@app.route("/api/admin")
+def get_all_users():
+    # Verificar se o admin está logado
+    if 'admin_id' not in session:
+        return jsonify({"error": "Acesso não autorizado"}), 401
+
+    admin_id = session['admin_id']  # ID do administrador logado
+
+    # Verificar se o admin existe na tabela admins
+    conn = sqlite3.connect('usuarios.db')
+    cursor = conn.cursor()
+
+    # Buscar todos os usuários do sistema
+    cursor.execute("SELECT id, username, email,nivel FROM usuarios")
+    all_users = cursor.fetchall()
+
+    # Montar a resposta em JSON
+    usuarios = [
+        {
+            "id": user[0],
+            "nome": user[1],
+            "email": user[2],
+            "nivel": user[3],
+        }
+        for user in all_users
+    ]
+
+    conn.close()
+    return jsonify(usuarios)
+
+@app.route('/admin-login', methods=['GET', 'POST'])
+def admin_login():
+    if request.method == 'POST':
+        username = request.form['username']
+        password = request.form['password']
+
+        conn = sqlite3.connect('usuarios.db')
+        cursor = conn.cursor()
+        cursor.execute('SELECT * FROM admins WHERE username = ? AND password = ?', (username, password))
+        admin = cursor.fetchone()
+        conn.close()
+
+        if admin:
+            session['admin_logged_in'] = True
+            flash('Login realizado com sucesso!', 'success')
+            return redirect(url_for('admin_dashboard'))
+        else:
+            flash('Credenciais inválidas.', 'danger')
+
+    return render_template('admin_login.html')
+
+
+@app.route('/admin-dashboard')
+def admin_dashboard():
+    if not session.get('admin_logged_in'):
+        flash('Acesso restrito. Faça login como administrador.', 'danger')
+        return redirect(url_for('admin_login'))
+
+    conn = sqlite3.connect('usuarios.db')
+    cursor = conn.cursor()
+
+    # Buscar todos os usuários
+    cursor.execute('SELECT id, username, email, nivel FROM usuarios')
+    usuarios = cursor.fetchall()
+
+
+    conn.close()
+
+    return render_template(
+        'admin_dashboard.html',
+        usuarios=usuarios,
+    )
+
+
+@app.route('/admin/block/<int:user_id>')
+def block_user(user_id):
+    if not session.get('admin_logged_in'):
+        flash('Acesso restrito.', 'danger')
+        return redirect(url_for('admin_login'))
+
+    conn = sqlite3.connect('usuarios.db')
+    cursor = conn.cursor()
+    cursor.execute('UPDATE usuarios SET status = "bloqueado" WHERE id = ?', (user_id,))
+    conn.commit()
+    conn.close()
+
+    flash('Usuário bloqueado com sucesso.', 'success')
+    return redirect(url_for('admin_dashboard'))
+
+
+@app.route('/admin/delete/<int:user_id>')
+def delete_user(user_id):
+    if not session.get('admin_logged_in'):
+        flash('Acesso restrito.', 'danger')
+        return redirect(url_for('admin_login'))
+
+    conn = sqlite3.connect('usuarios.db')
+    cursor = conn.cursor()
+    cursor.execute('DELETE FROM usuarios WHERE id = ?', (user_id,))
+    conn.commit()
+    conn.close()
+
+    flash('Usuário excluído com sucesso.', 'success')
+    return redirect(url_for('admin_dashboard'))
+
+@app.route('/configuracoes')
+def configuracoes():
+    return render_template('configuracoes.html')
+
+@app.route('/alterar-senha')
+def form_senha():
+    return render_template('alterar_senha.html')
+
+@app.route('/api/alterar-senha', methods=['POST'])
+def alterar_senha():
+    if 'user_id' not in session:
+        return jsonify({'error': 'Usuário não autorizado'}), 401
+
+    user_id = session['user_id']
+    senha_atual = request.form['senha_atual']
+    nova_senha = request.form['nova_senha']
+    confirmar_senha = request.form['confirmar_senha']
+
+    if nova_senha != confirmar_senha:
+        return jsonify({'error': 'As senhas não coincidem'}), 400
+
+    conn = sqlite3.connect('usuarios.db')
+    cursor = conn.cursor()
+
+    # Validar a senha atual
+    cursor.execute('SELECT password FROM usuarios WHERE id = ?', (user_id,))
+    senha_hash = cursor.fetchone()
+
+    if not senha_hash or not check_password_hash(senha_hash[0], senha_atual):
+        conn.close()
+        return jsonify({'error': 'Senha atual incorreta'}), 403
+
+    # Atualizar com a nova senha
+    nova_senha_hash = generate_password_hash(nova_senha)
+    cursor.execute('UPDATE usuarios SET password = ? WHERE id = ?', (nova_senha_hash, user_id))
+    conn.commit()
+    conn.close()
+
+    return jsonify({'success': 'Senha alterada com sucesso'})
+
 
 if __name__ == '__main__':
     init_db()
-    app.run(host='0.0.0.0',port=8081,debug=True)
+    app.run(host='0.0.0.0',port=8080,debug=True)

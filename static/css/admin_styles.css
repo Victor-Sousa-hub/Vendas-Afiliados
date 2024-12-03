@@ -1,0 +1,134 @@
+/* Reset básico */
+body, h1, h2, p, table, th, td {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f9f9f9;
+    color: #333;
+    line-height: 1.6;
+}
+
+/* Header */
+.admin-header {
+    background-color: #4CAF50;
+    color: #fff;
+    padding: 20px;
+    text-align: center;
+    box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.header-content h1 {
+    font-size: 2em;
+}
+
+.header-content .total-gasto {
+    font-weight: bold;
+    font-size: 1.2em;
+}
+
+.logout-btn {
+    display: inline-block;
+    margin-top: 10px;
+    padding: 10px 15px;
+    background-color: #e74c3c;
+    color: #fff;
+    text-decoration: none;
+    border-radius: 4px;
+    font-weight: bold;
+}
+
+.logout-btn:hover {
+    background-color: #c0392b;
+}
+
+/* Tabela */
+.table-container {
+    padding: 20px;
+    overflow-x: auto;
+}
+
+.styled-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 20px 0;
+    font-size: 1em;
+    text-align: left;
+    background-color: #fff;
+    border-radius: 5px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.styled-table th, .styled-table td {
+    padding: 12px 15px;
+    border: 1px solid #ddd;
+}
+
+.styled-table thead tr {
+    background-color: #4CAF50;
+    color: #fff;
+    text-align: left;
+}
+
+.styled-table tbody tr:nth-child(even) {
+    background-color: #f3f3f3;
+}
+
+.styled-table tbody tr:hover {
+    background-color: #f1f1f1;
+}
+
+/* Botões */
+.action-btn {
+    padding: 5px 10px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    color: #fff;
+    font-weight: bold;
+}
+
+.block-btn {
+    background-color: #f39c12;
+}
+
+.block-btn:hover {
+    background-color: #e67e22;
+}
+
+.delete-btn {
+    background-color: #e74c3c;
+}
+
+.delete-btn:hover {
+    background-color: #c0392b;
+}
+.admin-footer {
+    background-color: #f8f8f8; /* Cor de fundo do footer */
+    padding: 20px 0;
+    text-align: center;
+    border-top: 1px solid #ddd; /* Linha superior para separar o footer */
+    position: fixed; /* Mantém o footer fixado no final da página */
+    bottom: 0;
+    left: 0;
+    width: 100%; /* Faz o footer ocupar toda a largura */
+}
+
+.admin-footer .logout-btn {
+    display: inline-block;
+    padding: 10px 20px;
+    background-color: #e74c3c; /* Cor do botão */
+    color: #fff;
+    text-decoration: none;
+    font-size: 1em;
+    font-weight: bold;
+    border-radius: 4px;
+    transition: background-color 0.3s ease;
+}
+
+.admin-footer .logout-btn:hover {
+    background-color: #c0392b; /* Cor ao passar o mouse */
+}

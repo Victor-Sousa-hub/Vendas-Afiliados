@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Painel Administrativo</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/admin_styles.css') }}">
+</head>
+<body>
+    <header class="admin-header">
+        <div class="header-content">
+            <h1>Painel Administrativo</h1>
+        </div>
+    </header>
+    <main>
+        <h2>Usuários</h2>
+        <div class="table-container">
+            <table id="adminTable" class="styled-table">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Nome</th>
+                        <th>Email</th>
+                        <th>Status</th>
+                        <th>Ganhos Total</th>
+                        <th>Ações</th>
+                    </tr>
+                </thead>
+                <tbody id="tabelaUsuarios">
+                    {% for usuario in usuarios %}
+                    <tr>
+                        <td>{{ usuario[0] }}</td>
+                        <td>{{ usuario[1] }}</td>
+                        <td>{{ usuario[2] }}</td>
+                        <td>{{ usuario[3] }}</td>
+                        <td>R$ {{ usuario[3]*2 }}</td>
+                        <td>
+                            <button onclick="bloquearUsuario({ usuario:[0] })" class="action-btn block-btn">Bloquear</button>
+                            <button onclick="excluirUsuario({ usuario:[0] })" class="action-btn delete-btn">Excluir</button>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </main>
+    <script src="{{ url_for('static', filename='js/admin_dashboard.js') }}"></script>
+    <footer class="admin-footer">
+        <a href="{{ url_for('logout') }}" class="logout-btn">Sair</a>
+    </footer>
+    
+</body>
+</html>

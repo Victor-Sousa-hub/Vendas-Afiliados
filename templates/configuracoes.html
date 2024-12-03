@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/client_styles.css') }}">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js" crossorigin="anonymous"></script>
+    <title>Configurações</title>
+</head>
+<body>
+    <header>
+        <div class="header-content">
+            <div class="logo">
+                <span class="logo-h1">F</span>
+            </div>
+            <h1>Configurações</h1>
+        </div>
+    </header>
+
+    <!-- Botão para abrir o menu -->
+    <div id="menu-button" onclick="toggleMenu()">
+        ☰
+    </div>
+
+    <!-- Menu lateral -->
+    <div id="sidebar" class="sidebar-oculto">
+        <ul>
+            <li><a href="/client-area">Cliente</a></li>
+            <li><a href="/configuracoes">Configurações</a></li>
+            <li><a href="{{ url_for('logout') }}">Sair</a></li>
+        </ul>
+    </div>
+
+    <main class="config-container">
+       <!-- Card para Alterar Senha -->
+        <div class="card" onclick="redirecionar('/alterar-senha')">
+            <div class="icon-container">
+                <i class="fas fa-key"></i>
+            </div>
+            <h2>Alterar Senha</h2>
+        </div>
+        </div>
+
+        <!-- Card para Realizar Saque -->
+        <div class="card" onclick="exibirForm('realizar-saque')">
+            <div class="icon-container">
+                <i class="fas fa-wallet"></i>
+            </div>
+            <h2>Realizar Saque</h2>
+        </div>
+    </main>
+
+    <!-- Formulário de Realizar Saque -->
+    <section id="realizar-saque" class="form-container" style="display: none;">
+        <h2>Realizar Saque</h2>
+        <form>
+            <label for="valor-saque">Valor do Saque:</label>
+            <input type="number" id="valor-saque" name="valor_saque" required>
+            <br>
+            <button type="button" onclick="fecharForm('realizar-saque')">Fechar</button>
+        </form>
+    </section>
+
+    <script>
+        // Certifique-se de que o script seja executado somente após o DOM estar carregado
+        function redirecionar(url) {
+        console.log(`Redirecionando para: ${url}`);
+        window.location.href = url;
+    }
+
+
+        // Função para alternar o menu lateral
+        function toggleMenu() {
+            var sidebar = document.getElementById("sidebar");
+            sidebar.classList.toggle("sidebar-visivel");
+            sidebar.classList.toggle("sidebar-oculto");
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin - Login</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/login_styles.css') }}">
+</head>
+<body>
+    <div class="login-container">
+        <div class="login-card">
+            <h1>Admin Login</h1>
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    <ul class="flash-messages">
+                        {% for category, message in messages %}
+                            <li class="flash-{{ category }}">{{ message }}</li>
+                        {% endfor %}
+                    </ul>
+                {% endif %}
+            {% endwith %}
+            <form action="{{ url_for('admin_login') }}" method="POST">
+                <div class="form-group">
+                    <label for="username">Usuário</label>
+                    <input type="text" name="username" id="username" placeholder="Digite seu usuário" required>
+                </div>
+                <div class="form-group">
+                    <label for="password">Senha</label>
+                    <input type="password" name="password" id="password" placeholder="Digite sua senha" required>
+                </div>
+                <div class="form-actions">
+                    <button type="submit" class="btn-login">Entrar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</body>
+</html>

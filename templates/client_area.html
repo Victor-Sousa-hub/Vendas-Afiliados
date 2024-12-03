@@ -7,16 +7,13 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='css/client_styles.css') }}">
     <!-- Font Awesome para ícones (opcional) -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" integrity="sha512-" crossorigin="anonymous" referrerpolicy="no-referrer" />
-    <!-- Chart.js para gráficos -->
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script src="https://cdn.anychart.com/releases/8.7.1/js/anychart-core.min.js"></script>
-    <script src="https://cdn.anychart.com/releases/8.7.1/js/anychart-stock.min.js"></script>
+    
     </head>
 <body>
    <header>
     <div class="header-content">
         <div class="logo">
-            <span class="logo-h1{">F</span>
+            <span class="logo-h1">F</span>
         </div>
         <h1>Bem-vindo, {{ username }}</h1>
     </div>
@@ -29,63 +26,16 @@
     <!-- Menu lateral -->
     <div id="sidebar" class="sidebar-oculto">
         <ul>
-            <li><a href="#" onclick="mostrarSecao('investidor'); toggleMenu();">Investidor</a></li>
-            <li><a href="#" onclick="mostrarSecao('divulgador'); toggleMenu();">Divulgador</a></li>
-            <li><a href="#">Configurações</a></li>
+            <li><a href="/client-area" onclick="mostrarSecao('divulgador'); toggleMenu();">Cliente</a></li>
+            <li><a href="/configuracoes">Configurações</a></li>
             <li><a href="{{ url_for('logout') }}">Sair</a></li>
         </ul>
    
     </div>
-        <main>
-        <!-- Seção Investidor -->
-        <section id="investidor" class="secao-ativa">
-            <h1 class="titulo-estilizado">Página do Investidor</h1>
-        <!-- Cards de Informações -->
-        <div class="cards-container">
-           <div class="card-flip">
-              <div class="card-front">
-		<h3>Patrimônio Inicial</h3>
-		<p>R$ {{ patrimonio_inicial }}</p>
-              </div>
-            <div class="card-back">
-              <h3>Adicionar Créditos</h3>
-              <p>Clique aqui para adicionar</p>
-            </div>
-	  </div>            
-             <!-- Ganhos com efeito frente e verso -->
-    <div class="card-flip">
-        <div class="card-front">
-            <h3>Ganhos</h3>
-            <p>R$ {{ ganhos_em_reais }}</p>
-        </div>
-        <div class="card-back">
-            <h3>Ganhos em Porcentagem</h3>
-            <p>{{ porcentagem_ganhos }}%</p>
-        </div>
-    </div>
-    <!-- Patrimônio Atual com efeito frente e verso -->
-    <div class="card-flip">
-        <div class="card-front">
-            <h3>Patrimônio Atual</h3>
-            <p>R$ {{ patrimonio }}</p>
-        </div>
-        <div class="card-back">
-            <h3>Sacar</h3>
-            <p>Clique aqui para sacar</p>
-        </div>
-        </div>
-    </div>
-
-	<div id="grafico-patrimonio">
-	  <h3>Evolução do Patrimônio</h3>
-	  <div id="graficoDesempenho"></div> <!-- Troquei o <canvas> por uma <div> -->
-	  <script src="/static/js/candlestick.js"></script>
-	    </div>
-	</section>
-
+    <main>
         <!-- Seção Divulgador -->
         <section id="divulgador" class="secao-inativa">
-            <h1 class="titulo-estilizado-divulgador">Página do Divulgador</h1>
+            <h1 class="titulo-estilizado-divulgador">área do Cliente</h1>
             <div id="link-convite">
                 <h3>Seu Link de Convite</h3>
                 <input type="text" value="{{ link_convite }}" id="linkConvite" readonly>
